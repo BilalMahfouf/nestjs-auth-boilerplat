@@ -25,9 +25,6 @@ export class MeResponseDto {
     @ApiProperty({ example: 'drhouse' })
     userName!: string;
 
-    @ApiProperty({ example: 'Gregory House' })
-    fullName!: string;
-
     @ApiProperty({ example: 'doctor@example.com' })
     email!: string;
 
@@ -69,7 +66,6 @@ export class MeHandler {
         return {
             id: user.id,
             userName: user.userName,
-            fullName: user.fullName,
             email: user.email,
             role: user.role,
             isActive: user.isActive,

@@ -90,8 +90,6 @@ export abstract class UsersIntegrationBase extends IntegrationTestBase {
     protected async seedUser(overrides: Partial<UserEntity> = {}): Promise<UserEntity> {
         const user = this.usersRepository.create({
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
             email: 'doctor@example.com',
             passwordHash: await bcrypt.hash('Password123!', 10),
             role: overrides.role,

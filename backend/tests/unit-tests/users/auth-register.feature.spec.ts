@@ -86,8 +86,6 @@ describe('RegisterHandler', () => {
             email: 'doctor@example.com',
             password: 'password123',
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
         };
 
         await expect(handler.handle(command, response)).rejects.toBeInstanceOf(ConflictException);
@@ -104,8 +102,6 @@ describe('RegisterHandler', () => {
         usersRepository.save.mockResolvedValue({
             id: 'user-1',
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
             email: 'doctor@example.com',
             passwordHash: 'hashed-password',
             role: UserRole.Doctor,
@@ -123,8 +119,6 @@ describe('RegisterHandler', () => {
             email: 'doctor@example.com',
             password: 'password123',
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
         };
 
         const result = await handler.handle(command, response);
@@ -132,8 +126,6 @@ describe('RegisterHandler', () => {
         expect(result).toEqual({ token: 'access-token' });
         expect(usersRepository.create).toHaveBeenCalledWith({
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
             email: 'doctor@example.com',
             passwordHash: 'hashed-password',
             role: UserRole.Doctor,

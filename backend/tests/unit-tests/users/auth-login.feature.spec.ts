@@ -111,8 +111,6 @@ describe('LoginHandler', () => {
         usersRepository.findOne.mockResolvedValue({
             id: 'user-1',
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
             email: 'doctor@example.com',
             passwordHash: 'hashed-password',
             role: UserRole.Doctor,

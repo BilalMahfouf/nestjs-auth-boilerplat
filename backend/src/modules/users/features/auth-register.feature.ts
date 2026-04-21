@@ -48,16 +48,6 @@ export class RegisterCommandDto {
     @IsNotEmpty()
     @IsString()
     userName!: string;
-
-    @ApiProperty({ example: 'Gregory' })
-    @IsNotEmpty()
-    @IsString()
-    firstName!: string;
-
-    @ApiProperty({ example: 'House' })
-    @IsNotEmpty()
-    @IsString()
-    lastName!: string;
 }
 
 export class RegisterResponseDto {
@@ -115,8 +105,6 @@ export class RegisterHandler {
 
         const user = this.usersRepository.create({
             userName: command.userName,
-            firstName: command.firstName,
-            lastName: command.lastName,
             email: command.email,
             passwordHash: hashPassword,
             role: UserRole.Doctor,

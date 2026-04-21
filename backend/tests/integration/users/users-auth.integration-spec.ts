@@ -30,8 +30,6 @@ describe('Users auth integration', () => {
                 email: 'register@example.com',
                 password: 'Password123!',
                 userName: 'registerUser',
-                firstName: 'Reg',
-                lastName: 'User',
             },
             response,
         );
@@ -53,8 +51,6 @@ describe('Users auth integration', () => {
                 email: 'endpoint-register@example.com',
                 password: 'Password123!',
                 userName: 'endpointRegister',
-                firstName: 'End',
-                lastName: 'Point',
             })
             .expect(201);
 

@@ -23,12 +23,6 @@ export class UserEntity {
     @Column({ name: 'user_name', type: 'varchar', length: 100 })
     userName!: string;
 
-    @Column({ name: 'first_name', type: 'varchar', length: 100 })
-    firstName!: string;
-
-    @Column({ name: 'last_name', type: 'varchar', length: 100 })
-    lastName!: string;
-
     @Column({ name: 'email', type: 'varchar', length: 256 })
     email!: string;
 
@@ -47,10 +41,6 @@ export class UserEntity {
     @OneToMany(() => UserSessionEntity, (session) => session.user)
     sessions!: UserSessionEntity[];
 
-    get fullName(): string {
-        return `${this.firstName} ${this.lastName}`;
-    }
-
     updatePassword(newPassword: string, newPasswordHash: string): void {
         if (newPassword.length < 6) {
             throw new Error('User.InvalidPasswordLength');
@@ -59,10 +49,8 @@ export class UserEntity {
         this.passwordHash = newPasswordHash;
     }
 
-    updateProfile(userName: string, firstName: string, lastName: string): void {
+    updateProfile(userName: string): void {
         this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
 
     updateEmail(email: string): void {

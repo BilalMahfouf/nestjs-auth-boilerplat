@@ -69,8 +69,6 @@ describe('Users profile integration', () => {
         await expect(
             suite.updateUserProfileHandler.handle(randomUUID(), {
                 userName: 'newName',
-                firstName: 'New',
-                lastName: 'Name',
             }),
         ).rejects.toBeInstanceOf(NotFoundException);
 
@@ -81,13 +79,10 @@ describe('Users profile integration', () => {
 
         await suite.updateUserProfileHandler.handle(user.id, {
             userName: 'updatedUser',
-            firstName: 'Updated',
-            lastName: 'Name',
         });
 
         const updatedUser = await suite.usersRepository.findOne({ where: { id: user.id } });
         expect(updatedUser!.userName).toBe('updatedUser');
-        expect(updatedUser!.fullName).toBe('Updated Name');
     });
 
     it('update profile endpoint works over HTTP', async () => {
@@ -105,8 +100,6 @@ describe('Users profile integration', () => {
             .set('Authorization', suite.buildBearerToken(loginResult.token))
             .send({
                 userName: 'profileEndpointUpdated',
-                firstName: 'Profile',
-                lastName: 'Updated',
             })
             .expect(204);
 

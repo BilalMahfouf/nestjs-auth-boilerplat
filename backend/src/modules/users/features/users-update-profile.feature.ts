@@ -33,16 +33,6 @@ export class UpdateUserProfileCommandDto {
     @IsNotEmpty()
     @IsString()
     userName!: string;
-
-    @ApiProperty({ example: 'Gregory' })
-    @IsNotEmpty()
-    @IsString()
-    firstName!: string;
-
-    @ApiProperty({ example: 'House' })
-    @IsNotEmpty()
-    @IsString()
-    lastName!: string;
 }
 
 @Injectable()
@@ -61,7 +51,7 @@ export class UpdateUserProfileHandler {
             throw UsersErrors.userNotFound();
         }
 
-        user.updateProfile(command.userName, command.firstName, command.lastName);
+        user.updateProfile(command.userName);
         await this.usersRepository.save(user);
     }
 }
@@ -76,7 +66,7 @@ export class UpdateUserProfileEndpoint {
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
         summary: 'Update profile',
-        description: 'Updates username and display name for the authenticated user.',
+        description: 'Updates username for the authenticated user.',
     })
     @ApiAccessTokenAuth()
     @ApiBody({ type: UpdateUserProfileCommandDto })

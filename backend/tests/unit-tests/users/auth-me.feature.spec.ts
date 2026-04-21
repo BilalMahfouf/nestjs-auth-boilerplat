@@ -24,9 +24,6 @@ describe('MeHandler', () => {
         usersRepository.findOne.mockResolvedValue({
             id: 'user-1',
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
-            fullName: 'John Doe',
             email: 'doctor@example.com',
             role: 'Doctor',
             isActive: true,
@@ -38,7 +35,6 @@ describe('MeHandler', () => {
         expect(result).toEqual({
             id: 'user-1',
             userName: 'doctor1',
-            fullName: 'John Doe',
             email: 'doctor@example.com',
             role: 'Doctor',
             isActive: true,

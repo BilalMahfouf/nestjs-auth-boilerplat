@@ -22,8 +22,6 @@ describe('UpdateUserProfileHandler', () => {
 
         const command: UpdateUserProfileCommandDto = {
             userName: 'doctor1',
-            firstName: 'John',
-            lastName: 'Doe',
         };
 
         await expect(handler.handle('missing-user', command)).rejects.toBeInstanceOf(NotFoundException);
@@ -32,17 +30,11 @@ describe('UpdateUserProfileHandler', () => {
     it('updates profile when user exists', async () => {
         const user = {
             userName: 'oldUser',
-            firstName: 'Old',
-            lastName: 'Name',
             updateProfile: jest.fn(function (
-                this: { userName: string; firstName: string; lastName: string },
+                this: { userName: string },
                 userName: string,
-                firstName: string,
-                lastName: string,
             ) {
                 this.userName = userName;
-                this.firstName = firstName;
-                this.lastName = lastName;
             }),
         };
 
@@ -51,13 +43,11 @@ describe('UpdateUserProfileHandler', () => {
 
         const command: UpdateUserProfileCommandDto = {
             userName: 'doctor2',
-            firstName: 'Jane',
-            lastName: 'Smith',
         };
 
         await handler.handle('user-1', command);
 
-        expect(user.updateProfile).toHaveBeenCalledWith('doctor2', 'Jane', 'Smith');
+        expect(user.updateProfile).toHaveBeenCalledWith('doctor2');
         expect(usersRepository.save).toHaveBeenCalledWith(user);
     });
 });
