@@ -1,11 +1,10 @@
 import {
     Column,
-    CreateDateColumn,
     Entity,
     Index,
     OneToMany,
-    PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Entity as DomainEntity } from '../../../common/domain/entity';
 import { UserSessionEntity } from './user-session.entity';
 
 export enum UserRole {
@@ -16,9 +15,7 @@ export enum UserRole {
 @Entity('users')
 @Index('ix_users_email', ['email'], { unique: true })
 @Index('ix_users_user_name', ['userName'], { unique: true })
-export class UserEntity {
-    @PrimaryGeneratedColumn('uuid', { name: 'id' })
-    id!: string;
+export class UserEntity extends DomainEntity {
 
     @Column({ name: 'user_name', type: 'varchar', length: 100 })
     userName!: string;
@@ -34,9 +31,6 @@ export class UserEntity {
 
     @Column({ name: 'is_active', type: 'boolean', default: true })
     isActive!: boolean;
-
-    @CreateDateColumn({ name: 'created_on_utc', type: 'timestamptz' })
-    createdOnUtc!: Date;
 
     @OneToMany(() => UserSessionEntity, (session) => session.user)
     sessions!: UserSessionEntity[];
