@@ -4,8 +4,11 @@ import {
     RegisterCommandDto,
     RegisterHandler,
 } from '../../../src/modules/users/features/auth-register.feature';
-import { UserRole } from '../../../src/modules/users/entities/user.entity';
-import { UserSessionTokenType } from '../../../src/modules/users/entities/user-session.entity';
+import { UserEntity, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+    UserSessionEntity,
+    UserSessionTokenType,
+} from '../../../src/modules/users/entities/user-session.entity';
 
 jest.mock('bcrypt', () => ({
     hash: jest.fn(),
@@ -24,6 +27,14 @@ describe('RegisterHandler', () => {
     const sessionsRepository = {
         create: jest.fn(),
         save: jest.fn(),
+    };
+
+    const manager = {
+        getRepository: jest.fn(),
+    };
+
+    const dataSource = {
+        transaction: jest.fn(),
     };
 
     const jwtService = {
@@ -66,9 +77,24 @@ describe('RegisterHandler', () => {
             return values[key];
         });
 
+        manager.getRepository.mockImplementation((entity: unknown) => {
+            if (entity === UserEntity) {
+                return usersRepository;
+            }
+
+            if (entity === UserSessionEntity) {
+                return sessionsRepository;
+            }
+
+            throw new Error('Unexpected repository request');
+        });
+
+        dataSource.transaction.mockImplementation(async (callback: (txManager: typeof manager) => unknown) =>
+            callback(manager),
+        );
+
         handler = new RegisterHandler(
-            usersRepository as never,
-            sessionsRepository as never,
+            dataSource as never,
             jwtService as never,
             configService as never,
             authHelpers as never,
@@ -89,6 +115,7 @@ describe('RegisterHandler', () => {
         };
 
         await expect(handler.handle(command, response)).rejects.toBeInstanceOf(ConflictException);
+        expect(dataSource.transaction).toHaveBeenCalledTimes(1);
         expect(usersRepository.create).not.toHaveBeenCalled();
     });
 
@@ -124,6 +151,7 @@ describe('RegisterHandler', () => {
         const result = await handler.handle(command, response);
 
         expect(result).toEqual({ token: 'access-token' });
+        expect(dataSource.transaction).toHaveBeenCalledTimes(1);
         expect(usersRepository.create).toHaveBeenCalledWith({
             userName: 'doctor1',
             email: 'doctor@example.com',

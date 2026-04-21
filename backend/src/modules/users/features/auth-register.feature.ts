@@ -8,8 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import type { Response } from 'express';
 import { randomUUID } from 'crypto';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
@@ -61,10 +60,7 @@ export class RegisterResponseDto {
 @Injectable()
 export class RegisterHandler {
     constructor(
-        @InjectRepository(UserEntity)
-        private readonly usersRepository: Repository<UserEntity>,
-        @InjectRepository(UserSessionEntity)
-        private readonly sessionsRepository: Repository<UserSessionEntity>,
+        private readonly dataSource: DataSource,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly authHelpers: UsersAuthHelpers,
@@ -93,41 +89,50 @@ export class RegisterHandler {
     }
 
     async handle(command: RegisterCommandDto, response: Response): Promise<RegisterResponseDto> {
-        const isEmailInUse = await this.usersRepository.exists({
-            where: { email: command.email },
-        });
+        const { token, refreshToken, refreshExpiresAt } = await this.dataSource.transaction(
+            async (manager) => {
+                const usersRepository = manager.getRepository(UserEntity);
+                const sessionsRepository = manager.getRepository(UserSessionEntity);
 
-        if (isEmailInUse) {
-            throw UsersErrors.emailAlreadyInUse(command.email);
-        }
+                const isEmailInUse = await usersRepository.exists({
+                    where: { email: command.email },
+                });
 
-        const hashPassword = await bcrypt.hash(command.password, 10);
+                if (isEmailInUse) {
+                    throw UsersErrors.emailAlreadyInUse(command.email);
+                }
 
-        const user = this.usersRepository.create({
-            userName: command.userName,
-            email: command.email,
-            passwordHash: hashPassword,
-            role: UserRole.Doctor,
-            isActive: true,
-        });
+                const hashPassword = await bcrypt.hash(command.password, 10);
 
-        const savedUser = await this.usersRepository.save(user);
+                const user = usersRepository.create({
+                    userName: command.userName,
+                    email: command.email,
+                    passwordHash: hashPassword,
+                    role: UserRole.Doctor,
+                    isActive: true,
+                });
 
-        const token = this.generateAccessToken(savedUser);
-        const refreshToken = this.authHelpers.generateRefreshToken();
+                const savedUser = await usersRepository.save(user);
 
-        const refreshExpiresAt = new Date(
-            Date.now() + this.authHelpers.refreshCookieDays() * 24 * 60 * 60 * 1000,
+                const token = this.generateAccessToken(savedUser);
+                const refreshToken = this.authHelpers.generateRefreshToken();
+
+                const refreshExpiresAt = new Date(
+                    Date.now() + this.authHelpers.refreshCookieDays() * 24 * 60 * 60 * 1000,
+                );
+
+                const userSession = sessionsRepository.create({
+                    userId: savedUser.id,
+                    token: refreshToken,
+                    tokenType: UserSessionTokenType.Refresh,
+                    expiresAt: refreshExpiresAt,
+                });
+
+                await sessionsRepository.save(userSession);
+
+                return { token, refreshToken, refreshExpiresAt };
+            },
         );
-
-        const userSession = this.sessionsRepository.create({
-            userId: savedUser.id,
-            token: refreshToken,
-            tokenType: UserSessionTokenType.Refresh,
-            expiresAt: refreshExpiresAt,
-        });
-
-        await this.sessionsRepository.save(userSession);
 
         this.authHelpers.setRefreshTokenCookie(response, refreshToken, refreshExpiresAt);
 
