@@ -1,0 +1,4 @@
+
+> backend@0.0.1 build /mnt/c/Users/Bilal501/Desktop/ims/cv-builder/backend
+> nest build
+

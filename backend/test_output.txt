@@ -1,0 +1,20 @@
+
+> backend@0.0.1 test:unit /mnt/c/Users/Bilal501/Desktop/ims/cv-builder/backend
+> jest --rootDir . --testRegex "tests/unit-tests/.*\.spec\.ts$" --runInBand --no-cache
+
+PASS tests/unit-tests/users/auth-register.feature.spec.ts (32.846 s)
+PASS tests/unit-tests/users/auth-login.feature.spec.ts (9.537 s)
+PASS tests/unit-tests/users/auth-reset-password.feature.spec.ts (8.652 s)
+PASS tests/unit-tests/users/auth-refresh-token.feature.spec.ts (9.662 s)
+PASS tests/unit-tests/users/users-change-password.feature.spec.ts (9.477 s)
+PASS tests/unit-tests/users/auth-forget-password.feature.spec.ts (8.825 s)
+PASS tests/unit-tests/users/users-change-email.feature.spec.ts (14.859 s)
+PASS tests/unit-tests/users/users-update-profile.feature.spec.ts (8.477 s)
+PASS tests/unit-tests/users/auth-logout.feature.spec.ts (9.324 s)
+PASS tests/unit-tests/users/auth-me.feature.spec.ts (8.417 s)
+
+Test Suites: 10 passed, 10 total
+Tests:       29 passed, 29 total
+Snapshots:   0 total
+Time:        126.198 s
+Ran all test suites.
