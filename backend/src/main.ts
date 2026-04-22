@@ -5,24 +5,24 @@ import { AppModule } from './app.module';
 import { setupSwagger } from './common/swagger/swagger.setup';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
-    const port = Number(process.env.PORT ?? 3000);
-    app.setGlobalPrefix('api/v1');
-    app.use(cookieParser());
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            transform: true,
-            forbidNonWhitelisted: false,
-        }),
-    );
+  const app = await NestFactory.create(AppModule);
+  const port = Number(process.env.PORT ?? 3000);
+  app.setGlobalPrefix('api/v1');
+  app.use(cookieParser());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: false,
+    }),
+  );
 
-    setupSwagger(app);
+  setupSwagger(app);
 
-    await app.listen(port);
+  await app.listen(port);
 
-    const apiUrl = await app.getUrl();
-    console.log(`API running on: ${apiUrl} (port ${port})`);
-    console.log(`Swagger docs: ${apiUrl}/api/docs`);
+  const apiUrl = await app.getUrl();
+  console.log(`API running on: ${apiUrl} (port ${port})`);
+  console.log(`Swagger docs: ${apiUrl}/api/docs`);
 }
 bootstrap();

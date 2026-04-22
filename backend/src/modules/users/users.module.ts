@@ -8,81 +8,81 @@ import { UserSessionEntity } from './entities/user-session.entity';
 import { JwtStrategy } from '../../common/auth/jwt.strategy';
 import { UsersAuthHelpers } from './users-auth.helpers';
 import {
-    RegisterEndpoint,
-    RegisterHandler,
+  RegisterEndpoint,
+  RegisterHandler,
 } from './features/auth-register.feature';
 import { LoginEndpoint, LoginHandler } from './features/auth-login.feature';
 import {
-    RefreshTokenEndpoint,
-    RefreshTokenHandler,
+  RefreshTokenEndpoint,
+  RefreshTokenHandler,
 } from './features/auth-refresh-token.feature';
 import { LogoutEndpoint, LogoutHandler } from './features/auth-logout.feature';
 import {
-    ForgetPasswordEndpoint,
-    ForgetPasswordHandler,
+  ForgetPasswordEndpoint,
+  ForgetPasswordHandler,
 } from './features/auth-forget-password.feature';
 import {
-    ResetPasswordEndpoint,
-    ResetPasswordHandler,
+  ResetPasswordEndpoint,
+  ResetPasswordHandler,
 } from './features/auth-reset-password.feature';
 import { MeEndpoint, MeHandler } from './features/auth-me.feature';
 import {
-    ChangePasswordEndpoint,
-    ChangePasswordHandler,
+  ChangePasswordEndpoint,
+  ChangePasswordHandler,
 } from './features/users-change-password.feature';
 import {
-    ChangeEmailEndpoint,
-    ChangeEmailHandler,
+  ChangeEmailEndpoint,
+  ChangeEmailHandler,
 } from './features/users-change-email.feature';
 import {
-    UpdateUserProfileEndpoint,
-    UpdateUserProfileHandler,
+  UpdateUserProfileEndpoint,
+  UpdateUserProfileHandler,
 } from './features/users-update-profile.feature';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.registerAsync({
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
-                signOptions: {
-                    issuer: configService.getOrThrow<string>('JWT_ISSUER'),
-                    audience: configService.getOrThrow<string>('JWT_AUDIENCE'),
-                    expiresIn: `${configService.get<number>(
-                        'JWT_ACCESS_TOKEN_LIFETIME_MINUTES',
-                        50,
-                    )}m`,
-                },
-            }),
-        }),
-    ],
-    controllers: [
-        RegisterEndpoint,
-        LoginEndpoint,
-        RefreshTokenEndpoint,
-        LogoutEndpoint,
-        ForgetPasswordEndpoint,
-        ResetPasswordEndpoint,
-        MeEndpoint,
-        ChangePasswordEndpoint,
-        ChangeEmailEndpoint,
-        UpdateUserProfileEndpoint,
-    ],
-    providers: [
-        JwtStrategy,
-        UsersAuthHelpers,
-        RegisterHandler,
-        LoginHandler,
-        RefreshTokenHandler,
-        LogoutHandler,
-        ForgetPasswordHandler,
-        ResetPasswordHandler,
-        MeHandler,
-        ChangePasswordHandler,
-        ChangeEmailHandler,
-        UpdateUserProfileHandler,
-    ],
+  imports: [
+    TypeOrmModule.forFeature([UserEntity, UserSessionEntity]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
+        signOptions: {
+          issuer: configService.getOrThrow<string>('JWT_ISSUER'),
+          audience: configService.getOrThrow<string>('JWT_AUDIENCE'),
+          expiresIn: `${configService.get<number>(
+            'JWT_ACCESS_TOKEN_LIFETIME_MINUTES',
+            50,
+          )}m`,
+        },
+      }),
+    }),
+  ],
+  controllers: [
+    RegisterEndpoint,
+    LoginEndpoint,
+    RefreshTokenEndpoint,
+    LogoutEndpoint,
+    ForgetPasswordEndpoint,
+    ResetPasswordEndpoint,
+    MeEndpoint,
+    ChangePasswordEndpoint,
+    ChangeEmailEndpoint,
+    UpdateUserProfileEndpoint,
+  ],
+  providers: [
+    JwtStrategy,
+    UsersAuthHelpers,
+    RegisterHandler,
+    LoginHandler,
+    RefreshTokenHandler,
+    LogoutHandler,
+    ForgetPasswordHandler,
+    ResetPasswordHandler,
+    MeHandler,
+    ChangePasswordHandler,
+    ChangeEmailHandler,
+    UpdateUserProfileHandler,
+  ],
 })
-export class UsersModule { }
+export class UsersModule {}
