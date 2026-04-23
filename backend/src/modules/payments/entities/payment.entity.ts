@@ -8,110 +8,110 @@ import { PaymentStatus } from './payment-status.enum';
 @Index('ix_payments_status', ['status'])
 @Index('ix_payments_idempotency_key', ['idempotencyKey'], { unique: true })
 export class PaymentEntity extends DomainEntity {
-    @Column({ name: 'user_id', type: 'uuid' })
-    userId!: string;
+  @Column({ name: 'user_id', type: 'uuid' })
+  userId!: string;
 
-    @Column({ name: 'amount', type: 'numeric', precision: 18, scale: 2 })
-    amount!: string;
+  @Column({ name: 'amount', type: 'numeric', precision: 18, scale: 2 })
+  amount!: string;
 
-    @Column({ name: 'currency', type: 'varchar', length: 3 })
-    currency!: string;
+  @Column({ name: 'currency', type: 'varchar', length: 3 })
+  currency!: string;
 
-    @Column({ name: 'status', type: 'smallint' })
-    status!: PaymentStatus;
+  @Column({ name: 'status', type: 'smallint' })
+  status!: PaymentStatus;
 
-    @Column({ name: 'provider', type: 'varchar', length: 100 })
-    provider!: string;
+  @Column({ name: 'provider', type: 'varchar', length: 100 })
+  provider!: string;
 
-    @Column({
-        name: 'provider_payment_id',
-        type: 'varchar',
-        length: 255,
-        nullable: true,
-    })
-    providerPaymentId!: string | null;
+  @Column({
+    name: 'provider_payment_id',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  providerPaymentId!: string | null;
 
-    @Column({ name: 'idempotency_key', type: 'varchar', length: 255 })
-    idempotencyKey!: string;
+  @Column({ name: 'idempotency_key', type: 'varchar', length: 255 })
+  idempotencyKey!: string;
 
-    @Column({ name: 'provider_metadata', type: 'text', nullable: true })
-    providerMetadata!: string | null;
+  @Column({ name: 'provider_metadata', type: 'text', nullable: true })
+  providerMetadata!: string | null;
 
-    @Column({ name: 'failure_reason', type: 'text', nullable: true })
-    failureReason!: string | null;
+  @Column({ name: 'failure_reason', type: 'text', nullable: true })
+  failureReason!: string | null;
 
-    @Column({ name: 'paid_at', type: 'timestamptz', nullable: true })
-    paidAt!: Date | null;
+  @Column({ name: 'paid_at', type: 'timestamptz', nullable: true })
+  paidAt!: Date | null;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-    user!: UserEntity;
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user!: UserEntity;
 
-    static createPending(params: {
-        userId: string;
-        amount: number;
-        currency: string;
-        provider: string;
-        idempotencyKey: string;
-    }): PaymentEntity {
-        if (params.amount <= 0) {
-            throw new Error('Payment.InvalidAmount');
-        }
-
-        const normalizedCurrency = params.currency.trim().toUpperCase();
-        if (!/^[A-Z]{3}$/.test(normalizedCurrency)) {
-            throw new Error('Payment.InvalidCurrency');
-        }
-
-        if (!params.provider.trim()) {
-            throw new Error('Payment.InvalidProvider');
-        }
-
-        if (!params.idempotencyKey.trim()) {
-            throw new Error('Payment.InvalidIdempotencyKey');
-        }
-
-        return Object.assign(new PaymentEntity(), {
-            userId: params.userId,
-            amount: params.amount.toFixed(2),
-            currency: normalizedCurrency,
-            status: PaymentStatus.Pending,
-            provider: params.provider,
-            providerPaymentId: null,
-            idempotencyKey: params.idempotencyKey,
-            providerMetadata: null,
-            failureReason: null,
-            paidAt: null,
-        });
+  static createPending(params: {
+    userId: string;
+    amount: number;
+    currency: string;
+    provider: string;
+    idempotencyKey: string;
+  }): PaymentEntity {
+    if (params.amount <= 0) {
+      throw new Error('Payment.InvalidAmount');
     }
 
-    markPaid(metadata?: string): void {
-        this.status = PaymentStatus.Paid;
-        this.providerMetadata = metadata ?? this.providerMetadata;
-        this.paidAt = new Date();
+    const normalizedCurrency = params.currency.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(normalizedCurrency)) {
+      throw new Error('Payment.InvalidCurrency');
     }
 
-    markFailed(reason: string, metadata?: string): void {
-        this.status = PaymentStatus.Failed;
-        this.failureReason = reason;
-        this.providerMetadata = metadata ?? this.providerMetadata;
+    if (!params.provider.trim()) {
+      throw new Error('Payment.InvalidProvider');
     }
 
-    markExpired(reason: string, metadata?: string): void {
-        this.status = PaymentStatus.Expired;
-        this.failureReason = reason;
-        this.providerMetadata = metadata ?? this.providerMetadata;
+    if (!params.idempotencyKey.trim()) {
+      throw new Error('Payment.InvalidIdempotencyKey');
     }
 
-    markRefunded(): void {
-        this.status = PaymentStatus.Refunded;
-    }
+    return Object.assign(new PaymentEntity(), {
+      userId: params.userId,
+      amount: params.amount.toFixed(2),
+      currency: normalizedCurrency,
+      status: PaymentStatus.Pending,
+      provider: params.provider,
+      providerPaymentId: null,
+      idempotencyKey: params.idempotencyKey,
+      providerMetadata: null,
+      failureReason: null,
+      paidAt: null,
+    });
+  }
 
-    setProviderPaymentId(providerPaymentId: string | null): void {
-        this.providerPaymentId = providerPaymentId;
-    }
+  markPaid(metadata?: string): void {
+    this.status = PaymentStatus.Paid;
+    this.providerMetadata = metadata ?? this.providerMetadata;
+    this.paidAt = new Date();
+  }
 
-    setProviderMetadata(providerMetadata: string | null): void {
-        this.providerMetadata = providerMetadata;
-    }
+  markFailed(reason: string, metadata?: string): void {
+    this.status = PaymentStatus.Failed;
+    this.failureReason = reason;
+    this.providerMetadata = metadata ?? this.providerMetadata;
+  }
+
+  markExpired(reason: string, metadata?: string): void {
+    this.status = PaymentStatus.Expired;
+    this.failureReason = reason;
+    this.providerMetadata = metadata ?? this.providerMetadata;
+  }
+
+  markRefunded(): void {
+    this.status = PaymentStatus.Refunded;
+  }
+
+  setProviderPaymentId(providerPaymentId: string | null): void {
+    this.providerPaymentId = providerPaymentId;
+  }
+
+  setProviderMetadata(providerMetadata: string | null): void {
+    this.providerMetadata = providerMetadata;
+  }
 }
