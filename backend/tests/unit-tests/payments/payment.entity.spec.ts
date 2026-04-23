@@ -26,6 +26,7 @@ describe('PaymentEntity', () => {
         amount: 0,
         currency: 'USD',
         provider: 'InMemoryProvider',
+        idempotencyKey: 'fixed-key',
       }),
     ).toThrow('Payment.InvalidAmount');
   });
@@ -37,6 +38,7 @@ describe('PaymentEntity', () => {
         amount: 10,
         currency: 'US',
         provider: 'InMemoryProvider',
+        idempotencyKey: 'fixed-key',
       }),
     ).toThrow('Payment.InvalidCurrency');
   });
@@ -48,8 +50,21 @@ describe('PaymentEntity', () => {
         amount: 10,
         currency: 'USD',
         provider: '   ',
+        idempotencyKey: 'fixed-key',
       }),
     ).toThrow('Payment.InvalidProvider');
+  });
+
+  it('should throw when idempotency key is empty', () => {
+    expect(() =>
+      PaymentEntity.createPending({
+        userId: '8f09d08f-cc7e-42c8-9822-0f8c7d7d3d2e',
+        amount: 10,
+        currency: 'USD',
+        provider: 'InMemoryProvider',
+        idempotencyKey: '   ',
+      }),
+    ).toThrow('Payment.InvalidIdempotencyKey');
   });
 
   it('should mark paid when markPaid is called', () => {
@@ -58,6 +73,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.markPaid('paid-meta');
@@ -73,6 +89,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.markFailed('declined', 'failed-meta');
@@ -88,6 +105,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.markExpired('timeout', 'expired-meta');
@@ -103,6 +121,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.markRefunded();
@@ -116,6 +135,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.setProviderPaymentId('provider-123');
@@ -129,6 +149,7 @@ describe('PaymentEntity', () => {
       amount: 30,
       currency: 'USD',
       provider: 'InMemoryProvider',
+      idempotencyKey: 'fixed-key',
     });
 
     payment.setProviderMetadata('meta-json');
