@@ -131,8 +131,11 @@ export class CreateCheckoutHandler {
           existingPayment.providerPaymentId,
         )
         : null;
+      if (checkout === null) {
+        throw PaymentsErrors.checkoutNotFound();
+      }
 
-      return this.toResponse(existingPayment, checkout?.checkoutUri ?? null);
+      return this.toResponse(existingPayment, checkout.checkoutUri);
     }
 
     const userExists = await this.usersRepository.exists({
@@ -166,21 +169,12 @@ export class CreateCheckoutHandler {
 
     const savedPayment = await this.paymentsRepository.save(payment);
 
-    const checkout = savedPayment.providerPaymentId
-      ? await this.paymentService.getCheckoutByProviderPaymentId(
-        savedPayment.providerPaymentId,
-      )
-      : null;
-
-    return this.toResponse(
-      savedPayment,
-      checkout?.checkoutUri ?? processResult.checkoutUri ?? null,
-    );
+    return this.toResponse(savedPayment, processResult.checkoutUri);
   }
 
   private toResponse(
     payment: PaymentEntity,
-    checkoutUri: string | null,
+    checkoutUri: string,
   ): CreateCheckoutResponseDto {
     return {
       paymentId: payment.id,

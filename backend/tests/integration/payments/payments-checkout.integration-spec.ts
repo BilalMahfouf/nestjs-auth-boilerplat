@@ -153,7 +153,7 @@ describe('Payments checkout integration', () => {
         expect(sameKeyPayments).toHaveLength(1);
     });
 
-    it('should return existing payment with null checkout when idempotent record has no provider payment id', async () => {
+    it('should return not found when idempotent record has no provider payment id', async () => {
         const user = await suite.seedUser({
             email: 'payments-idempotent-null-provider-id@example.com',
             userName: 'paymentsIdempotentNullProviderId',
@@ -185,11 +185,9 @@ describe('Payments checkout integration', () => {
             .set('Authorization', suite.buildBearerToken(loginResult.token))
             .set('idempotency-key', saved.idempotencyKey)
             .send({ amount: 99.99, currency: 'USD' })
-            .expect(201);
+            .expect(404);
 
-        expect(response.body.paymentId).toBe(saved.id);
-        expect(response.body.providerPaymentId).toBe('');
-        expect(response.body.checkoutUri).toBeNull();
+        expect(response.body.code).toBe('Payment.CheckoutNotFound');
     });
 
     it('should return unauthorized when checkout endpoint is called without token', async () => {

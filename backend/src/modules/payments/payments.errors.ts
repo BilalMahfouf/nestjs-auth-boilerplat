@@ -25,4 +25,10 @@ export const PaymentsErrors = {
       message: 'Unable to process payment with provider',
     });
   },
+  checkoutNotFound(): NotFoundException {
+    return new NotFoundException({
+      code: 'Payment.CheckoutNotFound',
+      message: 'Unable to find the checkout ',
+    });
+  },
 };

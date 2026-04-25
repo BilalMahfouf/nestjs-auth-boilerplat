@@ -101,6 +101,55 @@ describe('CreateCheckoutHandler', () => {
         expect(paymentsRepository.save).not.toHaveBeenCalled();
     });
 
+    it('should throw not found when existing idempotent payment has no provider payment id', async () => {
+        paymentsRepository.findOne.mockResolvedValue({
+            id: 'payment-existing',
+            status: PaymentStatus.Pending,
+            provider: 'InMemoryProvider',
+            providerPaymentId: null,
+            idempotencyKey: 'idem-existing',
+            amount: '59.99',
+            currency: 'USD',
+        });
+
+        const command: CreateCheckoutCommandDto = {
+            amount: 59.99,
+            currency: 'USD',
+        };
+
+        await expect(
+            handler.handle('user-1', command, 'idem-existing'),
+        ).rejects.toBeInstanceOf(NotFoundException);
+
+        expect(paymentService.getCheckoutByProviderPaymentId).not.toHaveBeenCalled();
+        expect(paymentService.process).not.toHaveBeenCalled();
+    });
+
+    it('should throw not found when provider checkout lookup returns null for existing idempotent payment', async () => {
+        paymentsRepository.findOne.mockResolvedValue({
+            id: 'payment-existing',
+            status: PaymentStatus.Pending,
+            provider: 'InMemoryProvider',
+            providerPaymentId: 'provider-existing',
+            idempotencyKey: 'idem-existing',
+            amount: '59.99',
+            currency: 'USD',
+        });
+        paymentService.getCheckoutByProviderPaymentId.mockResolvedValue(null);
+
+        const command: CreateCheckoutCommandDto = {
+            amount: 59.99,
+            currency: 'USD',
+        };
+
+        await expect(
+            handler.handle('user-1', command, 'idem-existing'),
+        ).rejects.toBeInstanceOf(NotFoundException);
+
+        expect(paymentService.process).not.toHaveBeenCalled();
+        expect(paymentsRepository.save).not.toHaveBeenCalled();
+    });
+
     it('should throw not found when user does not exist', async () => {
         usersRepository.exists.mockResolvedValue(false);
 
